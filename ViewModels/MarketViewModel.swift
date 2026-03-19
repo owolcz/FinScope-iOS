@@ -16,7 +16,7 @@ class MarketViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
 
     // Na razie tylko jeden symbol żeby oszczędzać limity API
-    let symbols = ["AAPL"]
+    let symbols = ["AAPL", "IBM", "UBER", "WMT"]
 
     func loadMarket() async {
         isLoading = true

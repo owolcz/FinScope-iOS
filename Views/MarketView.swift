@@ -34,21 +34,22 @@ struct MarketView: View {
                 } else {
                     // Lista z kursami akcji
                     List(viewModel.quotes) { quote in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(quote.symbol)
-                                    .font(.headline)
-                                Text("Cena: $\(quote.price, specifier: "%.2f")")
+                        NavigationLink(destination: StockDetailView(quote: quote)) {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(quote.symbol)
+                                        .font(.headline)
+                                    Text("Cena: $\(quote.price, specifier: "%.2f")")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Text("\(quote.changePercentValue >= 0 ? "▲" : "▼") \(abs(quote.changePercentValue), specifier: "%.2f")%")
+                                    .foregroundColor(quote.changePercentValue >= 0 ? .green : .red)
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
                             }
-                            Spacer()
-                            // Zmiana procentowa – zielona jeśli + , czerwona jeśli –
-                            Text("\(quote.changePercentValue >= 0 ? "▲" : "▼") \(abs(quote.changePercentValue), specifier: "%.2f")%")
-                                .foregroundColor(quote.changePercentValue >= 0 ? .green : .red)
-                                .font(.subheadline)
+                            .padding(.vertical, 4)
                         }
-                        .padding(.vertical, 4)
                     }
                 }
             }

@@ -34,4 +34,37 @@ class APIClient {
         let decoder = JSONDecoder()
         return try decoder.decode(StockQuote.self, from: data)
     }
+    
+    // Pobiera historię cen dla podanego symbolu
+    // Endpoint: GET /stocks/AAPL/history
+    // Pobiera historię cen – backend zwraca tablicę bezpośrednio
+    static func fetchHistory(symbol: String, range: String = "1M") async throws -> StockHistoryResponse {
+        guard let url = URL(string: "\(baseURL)/stocks/\(symbol)/history?range=\(range)") else {
+            throw URLError(.badURL)
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder().decode(StockHistoryResponse.self, from: data)
+    }
+    
+    static func fetchOverview(symbol: String) async throws -> CompanyOverview {
+        guard let url = URL(string: "\(baseURL)/stocks/\(symbol)/overview") else {
+            throw URLError(.badURL)
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder().decode(CompanyOverview.self, from: data)
+    }
 }
