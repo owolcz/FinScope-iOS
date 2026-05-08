@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct MarketView: View {
-    // ViewModel – tutaj trzymamy dane i logikę
     @StateObject private var viewModel = MarketViewModel()
 
     var body: some View {
         NavigationStack {
             Group {
-                // Obsługa stanów: loading / error / success
                 if viewModel.isLoading {
                     ProgressView("Ładowanie danych...")
-
                 } else if let error = viewModel.errorMessage {
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle")
@@ -30,15 +27,23 @@ struct MarketView: View {
                         }
                     }
                     .padding()
-
                 } else {
-                    // Lista z kursami akcji
-                    List(viewModel.quotes) { quote in
+                    // ZMIANA 1: Używamy posortowanej listy z ViewModelu
+                    List(viewModel.sortedQuotes) { quote in
                         NavigationLink(destination: StockDetailView(quote: quote)) {
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text(quote.symbol)
-                                        .font(.headline)
+                                    HStack {
+                                        Text(quote.symbol)
+                                            .font(.headline)
+                                        
+                                        // ZMIANA 2: Pokazujemy gwiazdkę, jeśli element jest w ulubionych
+                                        if viewModel.favoriteSymbols.contains(quote.symbol) {
+                                            Image(systemName: "star.fill")
+                                                .foregroundColor(.yellow)
+                                                .font(.caption)
+                                        }
+                                    }
                                     Text("Cena: $\(quote.price, specifier: "%.2f")")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
@@ -50,11 +55,26 @@ struct MarketView: View {
                             }
                             .padding(.vertical, 4)
                         }
+                        // ZMIANA 3: Dodajemy akcję po przesunięciu wiersza palcem (od lewej do prawej)
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                // Wywołujemy funkcję z ViewModelu po kliknięciu
+                                viewModel.toggleFavorite(for: quote.symbol)
+                            } label: {
+                                // Dynamicznie zmieniamy wygląd przycisku (Dodaj/Usuń)
+                                let isFav = viewModel.favoriteSymbols.contains(quote.symbol)
+                                Label(isFav ? "Usuń" : "Ulubione", systemImage: isFav ? "star.slash.fill" : "star.fill")
+                            }
+                            .tint(viewModel.favoriteSymbols.contains(quote.symbol) ? .red : .yellow)
+                        }
                     }
+//                    // Mechanizm pociągnij-aby-odświeżyć
+//                    .refreshable {
+//                        await viewModel.loadMarket()
+//                    }
                 }
             }
             .navigationTitle("📈 Rynek")
-            // Ładuj dane gdy widok się pojawi
             .task {
                 await viewModel.loadMarket()
             }
