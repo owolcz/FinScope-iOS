@@ -13,7 +13,7 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.isSearching {
+                if viewModel.isLoading { 
                     ProgressView("Szukanie...")
                 } else if viewModel.searchResults.isEmpty && !viewModel.searchText.isEmpty {
                     ContentUnavailableView.search(text: viewModel.searchText)
@@ -41,8 +41,8 @@ struct SearchView: View {
             .navigationTitle("Szukaj")
             .searchable(text: $viewModel.searchText, prompt: "Wpisz symbol (np. AAPL)")
             .task {
-                if viewModel.allTasks.isEmpty {
-                    await viewModel.fetchAllData()
+                if viewModel.allQuotes.isEmpty {
+                    await viewModel.loadMarket()
                 }
             }
         }

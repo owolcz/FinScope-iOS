@@ -38,7 +38,6 @@ class SearchViewModel: ObservableObject {
 
         for symbol in symbols {
             do {
-                // Zakładam, że Twoja struktura APIClient i funkcja fetchQuote działają poprawnie
                 let quote = try await APIClient.fetchQuote(symbol: symbol)
                 fetchedQuotes.append(quote)
             } catch {
