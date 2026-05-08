@@ -11,7 +11,7 @@ import SwiftUI
 struct FinScopeApp: App {
     var body: some Scene {
         WindowGroup {
-            MarketView()   // na razie startujemy od widoku rynku
+            ContentView()
         }
     }
 }
