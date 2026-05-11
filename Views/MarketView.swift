@@ -1,10 +1,3 @@
-//
-//  MarketView.swift
-//  FinScope
-//
-//  Created by Oskar on 18/03/2026.
-//
-
 import SwiftUI
 
 struct MarketView: View {
@@ -12,73 +5,159 @@ struct MarketView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                Color.fsBackground.ignoresSafeArea()
+
                 if viewModel.isLoading {
-                    ProgressView("Ładowanie danych...")
-                } else if let error = viewModel.errorMessage {
                     VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
+                        ProgressView()
+                            .tint(Color.fsAccent)
+                        Text("Ładowanie danych...")
+                            .foregroundColor(Color.fsSecondary)
+                            .font(.subheadline)
+                    }
+
+                } else if let error = viewModel.errorMessage {
+                    VStack(spacing: 20) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 44))
+                            .foregroundColor(Color.fsRed)
                         Text(error)
                             .multilineTextAlignment(.center)
+                            .foregroundColor(Color.fsSecondary)
+                            .padding(.horizontal)
                         Button("Spróbuj ponownie") {
                             Task { await viewModel.loadMarket() }
                         }
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Color.fsBackground)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 13)
+                        .background(Color.fsAccent)
+                        .cornerRadius(12)
                     }
-                    .padding()
+
                 } else {
-                    // ZMIANA 1: Używamy posortowanej listy z ViewModelu
-                    List(viewModel.sortedQuotes) { quote in
-                        NavigationLink(destination: StockDetailView(quote: quote)) {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    HStack {
-                                        Text(quote.symbol)
-                                            .font(.headline)
-                                        
-                                        // ZMIANA 2: Pokazujemy gwiazdkę, jeśli element jest w ulubionych
-                                        if viewModel.favoriteSymbols.contains(quote.symbol) {
-                                            Image(systemName: "star.fill")
-                                                .foregroundColor(.yellow)
-                                                .font(.caption)
-                                        }
-                                    }
-                                    Text("Cena: $\(quote.price, specifier: "%.2f")")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                                Text("\(quote.changePercentValue >= 0 ? "▲" : "▼") \(abs(quote.changePercentValue), specifier: "%.2f")%")
-                                    .foregroundColor(quote.changePercentValue >= 0 ? .green : .red)
-                                    .font(.subheadline)
+                    VStack(spacing: 0) {
+                        Picker("", selection: $viewModel.assetType) {
+                            ForEach(AssetType.allCases, id: \.self) {
+                                Text($0.rawValue).tag($0)
                             }
-                            .padding(.vertical, 4)
                         }
-                        // ZMIANA 3: Dodajemy akcję po przesunięciu wiersza palcem (od lewej do prawej)
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                // Wywołujemy funkcję z ViewModelu po kliknięciu
-                                viewModel.toggleFavorite(for: quote.symbol)
-                            } label: {
-                                // Dynamicznie zmieniamy wygląd przycisku (Dodaj/Usuń)
-                                let isFav = viewModel.favoriteSymbols.contains(quote.symbol)
-                                Label(isFav ? "Usuń" : "Ulubione", systemImage: isFav ? "star.slash.fill" : "star.fill")
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+
+                        ScrollView {
+                            LazyVStack(spacing: 10) {
+                                ForEach(viewModel.sortedQuotes) { quote in
+                                    NavigationLink(
+                                        destination: StockDetailView(
+                                            quote: quote,
+                                            assetType: viewModel.assetType
+                                        )
+                                    ) {
+                                        QuoteRowCard(
+                                            quote: quote,
+                                            assetType: viewModel.assetType,
+                                            isFavorite: viewModel.favoriteSymbols.contains(quote.symbol),
+                                            onToggleFavorite: {
+                                                viewModel.toggleFavorite(for: quote.symbol)
+                                            }
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .tint(viewModel.favoriteSymbols.contains(quote.symbol) ? .red : .yellow)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 4)
+                            .padding(.bottom, 20)
                         }
                     }
-//                    // Mechanizm pociągnij-aby-odświeżyć
-//                    .refreshable {
-//                        await viewModel.loadMarket()
-//                    }
                 }
             }
-            .navigationTitle("📈 Rynek")
+            .navigationTitle("FinScope")
+            .navigationBarTitleDisplayMode(.large)
             .task {
                 await viewModel.loadMarket()
             }
         }
+    }
+}
+
+struct QuoteRowCard: View {
+    let quote: StockQuote
+    let assetType: AssetType
+    let isFavorite: Bool
+    let onToggleFavorite: () -> Void
+
+    private var isPositive: Bool { quote.changePercentValue >= 0 }
+    private var displayName: String { assetType.displayName(for: quote.symbol) }
+    private var changeColor: Color { isPositive ? Color.fsGreen : Color.fsRed }
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.fsSurface2)
+                    .frame(width: 46, height: 46)
+                Text(String(displayName.prefix(2)).uppercased())
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(Color.fsAccent)
+            }
+
+            Text(displayName)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.white)
+                .lineLimit(1)
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 5) {
+                Text(marketFormattedPrice(quote.price, type: assetType))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white)
+
+                HStack(spacing: 3) {
+                    Image(systemName: isPositive ? "arrow.up.right" : "arrow.down.right")
+                        .font(.system(size: 10, weight: .bold))
+                    Text("\(abs(quote.changePercentValue), specifier: "%.2f")%")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundColor(changeColor)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(changeColor.opacity(0.15))
+                .cornerRadius(6)
+            }
+
+            if assetType == .stocks {
+                Button(action: onToggleFavorite) {
+                    Image(systemName: isFavorite ? "star.fill" : "star")
+                        .font(.system(size: 16))
+                        .foregroundColor(isFavorite ? Color.fsAccent : Color.fsSecondary.opacity(0.5))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(14)
+        .background(Color.fsSurface)
+        .cornerRadius(14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(isFavorite ? Color.fsAccent.opacity(0.4) : Color.fsBorder, lineWidth: 1)
+        )
+    }
+}
+
+private func marketFormattedPrice(_ price: Double, type: AssetType) -> String {
+    switch type {
+    case .stocks, .crypto:
+        return price >= 1000
+            ? String(format: "$%.0f", price)
+            : String(format: "$%.2f", price)
+    case .forex:
+        return String(format: "%.4f", price)
     }
 }
 

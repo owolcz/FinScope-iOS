@@ -1,10 +1,3 @@
-//
-//  DetailViewModel.swift
-//  FinScope
-//
-//  Created by Oskar on 19/03/2026.
-//
-
 import Foundation
 import Combine
 
@@ -15,45 +8,77 @@ class DetailViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published var selectedRange: String = "1M"
-    @Published var rangeChangePercent: Double = 0.0  // ← nowe pole
+    @Published var rangeChangePercent: Double = 0.0
     @Published var overview: CompanyOverview? = nil
+    @Published var news: [NewsArticle] = []
 
     func loadHistory(symbol: String, range: String = "1M") async {
         isLoading = true
         errorMessage = nil
 
-        // Ładujemy historię i overview równolegle – szybciej niż po kolei
-        async let historyTask = APIClient.fetchHistory(symbol: symbol, range: range)
-        async let overviewTask = APIClient.fetchOverview(symbol: symbol)
+        var lastError: Error? = nil
 
-        do {
-            let response = try await historyTask
-
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd"
-
-            let points = response.history.compactMap { entry -> PricePoint? in
-                guard let date = formatter.date(from: entry.date) else { return nil }
-                return PricePoint(date: date, close: entry.close)
+        for attempt in 1...3 {
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
             }
 
-            self.pricePoints = points.sorted { $0.date < $1.date }
+            do {
+                let response = try await APIClient.fetchHistory(symbol: symbol, range: range)
 
-            if let first = self.pricePoints.first, let last = self.pricePoints.last {
-                self.rangeChangePercent = ((last.close - first.close) / first.close) * 100
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                let points = response.history.compactMap { entry -> PricePoint? in
+                    guard let date = formatter.date(from: entry.date) else { return nil }
+                    return PricePoint(date: date, close: entry.close)
+                }
+                self.pricePoints = points.sorted { $0.date < $1.date }
+
+                if let first = self.pricePoints.first, let last = self.pricePoints.last {
+                    self.rangeChangePercent = ((last.close - first.close) / first.close) * 100
+                }
+
+                lastError = nil
+                break
+
+            } catch is CancellationError {
+                isLoading = false
+                return
+            } catch {
+                lastError = error
+                if attempt < 3 {
+                    try? await Task.sleep(nanoseconds: 3_000_000_000)
+                }
             }
-        } catch {
-            print("❌ Błąd historii: \(error)")
-            errorMessage = "Nie udało się pobrać historii: \(error.localizedDescription)"
         }
 
-        do {
-            self.overview = try await overviewTask
-        } catch {
-            // Overview nie jest krytyczne – nie blokujemy ekranu
-            print("⚠️ Błąd overview: \(error)")
+        if let error = lastError {
+            print("❌ \(error)")
+            errorMessage = "Nie udało się pobrać danych. Spróbuj ponownie za chwilę."
         }
 
         isLoading = false
+
+        guard !Task.isCancelled else { return }
+
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                do {
+                    let overview = try await APIClient.fetchOverview(symbol: symbol)
+                    await MainActor.run { self.overview = overview }
+                } catch {
+                    print("⚠️ overview: \(error)")
+                }
+            }
+            group.addTask {
+                do {
+                    let response = try await APIClient.fetchNews(symbol: symbol)
+                    await MainActor.run { self.news = response.news }
+                } catch {
+                    print("⚠️ news: \(error)")
+                }
+            }
+        }
     }
 }

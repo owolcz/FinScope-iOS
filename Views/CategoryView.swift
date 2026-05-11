@@ -1,15 +1,17 @@
-//
-//  CategoryView.swift
-//  FinScope
-//
-//  Created by Justynka  on 04/05/2026.
-//
-
 import SwiftUI
 
 struct CategoryView: View {
+    @StateObject private var viewModel = CategoryViewModel()
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack {
+                Color.fsBackground.ignoresSafeArea()
+                Text("Tutaj będą kategorie")
+                    .foregroundColor(Color.fsSecondary)
+            }
+            .navigationTitle("Kategorie")
+        }
     }
 }
 
