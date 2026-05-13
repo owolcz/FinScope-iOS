@@ -48,7 +48,7 @@ struct StockDetailView: View {
                         VStack(spacing: 12) {
                             ProgressView()
                                 .tint(Color.fsAccent)
-                            Text("Ładowanie wykresu...")
+                            Text("Loading chart...")
                                 .font(.subheadline)
                                 .foregroundColor(Color.fsSecondary)
                         }
@@ -59,7 +59,7 @@ struct StockDetailView: View {
                             Text(error)
                                 .foregroundColor(Color.fsRed)
                                 .multilineTextAlignment(.center)
-                            Button("Spróbuj ponownie") {
+                            Button("Try again") {
                                 Task {
                                     await viewModel.loadHistory(
                                         symbol: quote.symbol,
@@ -80,15 +80,15 @@ struct StockDetailView: View {
                     } else if !viewModel.pricePoints.isEmpty {
                         Chart(viewModel.pricePoints) { point in
                             LineMark(
-                                x: .value("Data", point.date),
-                                y: .value("Cena", point.close)
+                                x: .value("Date", point.date),
+                                y: .value("Price", point.close)
                             )
                             .foregroundStyle(trendColor)
                             .lineStyle(StrokeStyle(lineWidth: 2))
 
                             AreaMark(
-                                x: .value("Data", point.date),
-                                y: .value("Cena", point.close)
+                                x: .value("Date", point.date),
+                                y: .value("Price", point.close)
                             )
                             .foregroundStyle(
                                 LinearGradient(

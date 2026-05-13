@@ -45,7 +45,6 @@ class MarketViewModel: ObservableObject {
     }
 
     var sortedQuotes: [StockQuote] {
-        guard assetType == .stocks else { return quotes }
         return quotes.sorted { q1, q2 in
             let f1 = favoriteSymbols.contains(q1.symbol)
             let f2 = favoriteSymbols.contains(q2.symbol)
@@ -82,7 +81,7 @@ class MarketViewModel: ObservableObject {
             }
         }
         if fetched.isEmpty {
-            errorMessage = "Nie udało się pobrać danych."
+            errorMessage = "Failed to fetch data."
         } else {
             quotes = fetched
             errorMessage = nil

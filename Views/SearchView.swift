@@ -17,10 +17,10 @@ class SearchViewModel: ObservableObject {
             let response = try await APIClient.fetchSearch(query: query)
             self.results = response.results
             if results.isEmpty {
-                errorMessage = "Brak wyników dla \"\(query)\""
+                errorMessage = "No results found for \"\(query)\""
             }
         } catch {
-            errorMessage = "Nie udało się wyszukać. Sprawdź połączenie i spróbuj ponownie."
+            errorMessage = "Search failed. Please check your connection and try again."
         }
         isLoading = false
     }
@@ -41,7 +41,7 @@ struct SearchView: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(Color.fsAccent)
-                        Text("Pobieranie danych spółki...")
+                        Text("Fetching company data...")
                             .foregroundColor(Color.fsSecondary)
                             .font(.subheadline)
                     }
@@ -51,7 +51,7 @@ struct SearchView: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(Color.fsAccent)
-                        Text("Szukam...")
+                        Text("Searching...")
                             .foregroundColor(Color.fsSecondary)
                             .font(.subheadline)
                     }
@@ -66,6 +66,16 @@ struct SearchView: View {
                             .foregroundColor(Color.fsSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 32)
+                        
+                        Button("Try again") {
+                            Task { await viewModel.search(query: query) }
+                        }
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(Color.fsBackground)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.fsAccent)
+                        .cornerRadius(10)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -80,7 +90,7 @@ struct SearchView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                        Text("Wpisz nazwę lub symbol spółki")
+                        Text("Enter a name or stock symbol")
                             .foregroundColor(Color.fsSecondary)
                             .font(.subheadline)
                     }
@@ -108,8 +118,8 @@ struct SearchView: View {
                     )
                 }
             }
-            .navigationTitle("Szukaj")
-            .searchable(text: $query, prompt: "np. Apple, AAPL...")
+            .navigationTitle("Search")
+            .searchable(text: $query, prompt: "e.g. Apple, AAPL...")
             .onSubmit(of: .search) {
                 Task { await viewModel.search(query: query) }
             }

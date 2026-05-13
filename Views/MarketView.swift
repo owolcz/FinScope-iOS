@@ -12,7 +12,7 @@ struct MarketView: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(Color.fsAccent)
-                        Text("Ładowanie danych...")
+                        Text("Loading data...")
                             .foregroundColor(Color.fsSecondary)
                             .font(.subheadline)
                     }
@@ -26,7 +26,7 @@ struct MarketView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(Color.fsSecondary)
                             .padding(.horizontal)
-                        Button("Spróbuj ponownie") {
+                        Button("Try again") {
                             Task { await viewModel.loadMarket() }
                         }
                         .font(.system(size: 15, weight: .semibold))
@@ -134,17 +134,14 @@ struct QuoteRowCard: View {
                 .cornerRadius(6)
             }
 
-            if assetType == .stocks {
-                Button(action: onToggleFavorite) {
-                    Image(systemName: isFavorite ? "star.fill" : "star")
-                        .font(.system(size: 16))
-                        .foregroundColor(isFavorite ? Color.fsAccent : Color.fsSecondary.opacity(0.5))
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("favouriteButton")
-                .accessibilityLabel(isFavorite ? "Ulubione" : "Dodaj do ulubionych")
-
+            Button(action: onToggleFavorite) {
+                Image(systemName: isFavorite ? "star.fill" : "star")
+                    .font(.system(size: 16))
+                    .foregroundColor(isFavorite ? Color.fsAccent : Color.fsSecondary.opacity(0.5))
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("favouriteButton")
+            .accessibilityLabel(isFavorite ? "Favorite" : "Add to favorites")
         }
         .accessibilityElement(children: .contain)
         .padding(14)

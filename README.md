@@ -1,26 +1,29 @@
-# FinScope iOS
+A stock, cryptocurrency, and forex tracking application.
 
-Aplikacja do śledzenia kursów akcji, kryptowalut i walut forex.
+## Prerequisites
+- iOS 17+ (simulator or physical device)
+- Xcode 15.0+
 
-## Wymagania
+## Getting Started
+1. Clone the repository and open `FinScope.xcodeproj` in Xcode.
+2. Ensure the backend is running locally on port `8000` (default address in `Services/APIClient.swift` is `http://localhost:8000`).
+3. Select a simulator or device and press **Run** (⌘R).
 
-- Xcode 15+
-- iOS 17+ (symulator lub fizyczne urządzenie)
-- Uruchomiony backend ([finscope-backend](https://github.com/owolcz/finscope-backend))
-
-## Uruchomienie
-
-1. Sklonuj repozytorium i otwórz `FinScope.xcodeproj` w Xcode
-2. Upewnij się, że backend działa lokalnie na porcie `8000` (domyślny adres w `Services/APIClient.swift` to `http://localhost:8000`)
-3. Wybierz symulator lub urządzenie i naciśnij **Run** (⌘R)
-
-
-## Struktura projektu
-
+## Project Structure
 ```
 FinScope/
-├── Models/          # Modele danych (Stock, StockHistory, ...)
-├── Services/        # APIClient — komunikacja z backendem
-├── ViewModels/      # Logika widoków (MarketViewModel, DetailViewModel, ...)
-└── Views/           # Widoki SwiftUI (MarketView, StockDetailView, SearchView, ...)
+├── FinScope/           # Core application files, Theme, Assets
+├── Models/             # Data models (Stock, News, etc.)
+├── Services/           # Networking (APIClient)
+├── ViewModels/         # View logic (MarketViewModel, DetailViewModel, ...)
+├── Views/              # UI components and main screens
+├── FinScopeTests/      # Unit tests
+└── FinScopeTestsUI/    # UI tests
 ```
+
+## Features
+- Real-time stock market data tracking.
+- Category-based sector browsing.
+- Global search for symbols and companies.
+- Detailed stock history charts.
+- Favourites system with automatic reordering.

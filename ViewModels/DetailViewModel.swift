@@ -55,7 +55,7 @@ class DetailViewModel: ObservableObject {
 
         if let error = lastError {
             print("❌ \(error)")
-            errorMessage = "Nie udało się pobrać danych. Spróbuj ponownie za chwilę."
+            errorMessage = "Failed to fetch data. Please try again in a moment."
         }
 
         isLoading = false

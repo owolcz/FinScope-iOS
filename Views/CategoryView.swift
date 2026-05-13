@@ -8,21 +8,53 @@ struct CategoryView: View {
             ZStack {
                 Color.fsBackground.ignoresSafeArea()
                 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        ForEach(viewModel.categories) { category in
-                            CategorySection(
-                                category: category,
-                                isExpanded: viewModel.expandedCategories.contains(category.id),
-                                quotes: viewModel.mockQuotes,
-                                onToggle: { viewModel.toggleCategory(category.id) }
-                            )
-                        }
+                if viewModel.isLoading {
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .tint(Color.fsAccent)
+                        Text("Loading categories...")
+                            .foregroundColor(Color.fsSecondary)
+                            .font(.subheadline)
                     }
-                    .padding(.vertical, 16)
+                } else if let error = viewModel.errorMessage {
+                    VStack(spacing: 20) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 44))
+                            .foregroundColor(Color.fsRed)
+                        Text(error)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color.fsSecondary)
+                            .padding(.horizontal)
+                        Button("Try again") {
+                            Task { await viewModel.loadCategories() }
+                        }
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Color.fsBackground)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 13)
+                        .background(Color.fsAccent)
+                        .cornerRadius(12)
+                    }
+                } else {
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            ForEach(viewModel.categories) { category in
+                                CategorySection(
+                                    category: category,
+                                    isExpanded: viewModel.expandedCategories.contains(category.id),
+                                    quotes: viewModel.mockQuotes,
+                                    onToggle: { viewModel.toggleCategory(category.id) }
+                                )
+                            }
+                        }
+                        .padding(.vertical, 16)
+                    }
                 }
-                .navigationTitle("Browse Categories")
-                .navigationBarTitleDisplayMode(.large)
+            }
+            .navigationTitle("Browse Categories")
+            .navigationBarTitleDisplayMode(.large)
+            .task {
+                await viewModel.loadCategories()
             }
         }
     }
@@ -39,6 +71,7 @@ struct CategorySection: View {
             // Header
             Button(action: onToggle) {
                 HStack(spacing: 12) {
+                    // Ikona kategorii
                     Image(systemName: category.iconName)
                         .font(.system(size: 20))
                         .foregroundColor(Color.fsAccent)

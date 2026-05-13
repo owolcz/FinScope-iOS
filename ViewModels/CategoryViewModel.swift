@@ -45,10 +45,28 @@ class CategoryViewModel: ObservableObject {
     
     @Published var expandedCategories: Set<UUID> = []
     @Published var mockQuotes: [String: StockQuote] = [:]
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String? = nil
     
     init() {
-        setupMockData()
+        // Do not call setupMockData immediately, only through loadCategories
     }
+    @MainActor
+    func loadCategories() async {
+        isLoading = true
+        errorMessage = nil
+
+        // Simulate network delay
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+
+        setupMockData()
+
+        // Optional: Error simulation for testing (uncomment to see error state)
+        // errorMessage = "Failed to load categories. Please try again later."
+
+        isLoading = false
+    }
+
     
     func toggleCategory(_ categoryId: UUID) {
         if expandedCategories.contains(categoryId) {

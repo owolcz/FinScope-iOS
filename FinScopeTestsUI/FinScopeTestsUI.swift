@@ -23,7 +23,7 @@ final class FinScopeTestsUI: XCTestCase {
         let categoryTab = app.tabBars.buttons["Categories"]
         XCTAssertTrue(categoryTab.exists)
         categoryTab.tap()
-        XCTAssertTrue(app.navigationBars["Categories"].exists)
+        XCTAssertTrue(app.navigationBars["Browse Categories"].exists)
         
         let searchTab = app.tabBars.buttons["Search"]
         XCTAssertTrue(searchTab.exists)
@@ -63,7 +63,7 @@ final class FinScopeTestsUI: XCTestCase {
 
         app.tabBars.buttons["Search"].tap()
 
-        let searchField = app.searchFields["np. Apple, AAPL..."]
+        let searchField = app.searchFields["e.g. Apple, AAPL..."]
         XCTAssertTrue(searchField.exists)
         
         searchField.tap()
@@ -72,14 +72,13 @@ final class FinScopeTestsUI: XCTestCase {
         let clearButton = app.buttons["Clear text"]
         if clearButton.waitForExistence(timeout: 2) {
             clearButton.tap()
-            XCTAssertEqual(searchField.value as? String, "np. Apple, AAPL...")
+            XCTAssertEqual(searchField.value as? String, "e.g. Apple, AAPL...")
         }
         
-        searchField.tap()
-        let closeButton = app.buttons["Close"]
-        if closeButton.waitForExistence(timeout: 2) {
-            closeButton.tap()
-            XCTAssertTrue(app.staticTexts["Search"].exists)
+        let cancelButton = app.buttons["Cancel"]
+        if cancelButton.waitForExistence(timeout: 2) {
+            cancelButton.tap()
+            XCTAssertTrue(app.navigationBars["Search"].exists)
         }
     }
 
@@ -88,10 +87,11 @@ final class FinScopeTestsUI: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let firstCell = app/*@START_MENU_TOKEN@*/.staticTexts["AA"]/*[[".buttons.staticTexts[\"AA\"]",".staticTexts[\"AA\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch
+        let firstCell = app.buttons.matching(identifier: "QuoteCard").firstMatch
+        XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
         firstCell.tap()
             
-        // Sprawdź przyciski zakresu wykresu (1D, 1W, 1M...)
+        // Check chart range buttons
         XCTAssertTrue(app.buttons["1W"].exists)
         XCTAssertTrue(app.buttons["1M"].exists)
         XCTAssertTrue(app.buttons["3M"].exists)
@@ -105,6 +105,5 @@ final class FinScopeTestsUI: XCTestCase {
         XCTAssertTrue(app.staticTexts["About"].exists)
         
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        
     }
 }
