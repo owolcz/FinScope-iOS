@@ -20,17 +20,17 @@ final class FinScopeTestsUI: XCTestCase {
         
         XCTAssertTrue(app.navigationBars["FinScope"].exists)
         
-        let categoryTab = app.tabBars.buttons["Kategoria"]
+        let categoryTab = app.tabBars.buttons["Categories"]
         XCTAssertTrue(categoryTab.exists)
         categoryTab.tap()
-        XCTAssertTrue(app.navigationBars["Kategorie"].exists)
+        XCTAssertTrue(app.navigationBars["Categories"].exists)
         
-        let searchTab = app.tabBars.buttons["Szukaj"]
+        let searchTab = app.tabBars.buttons["Search"]
         XCTAssertTrue(searchTab.exists)
         searchTab.tap()
-        XCTAssertTrue(app.navigationBars["Szukaj"].exists)
+        XCTAssertTrue(app.navigationBars["Search"].exists)
         
-        let marketTab = app.tabBars.buttons["Rynek"]
+        let marketTab = app.tabBars.buttons["Market"]
         XCTAssertTrue(marketTab.exists)
         marketTab.tap()
         XCTAssertTrue(app.navigationBars["FinScope"].exists)
@@ -43,7 +43,7 @@ final class FinScopeTestsUI: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["FinScope"].exists)
 
-        let stocksButton = app.buttons["Akcje"]
+        let stocksButton = app.buttons["Stocks"]
         let cryptoButton = app.buttons["Crypto"]
         let forexButton = app.buttons["Forex"]
 
@@ -61,7 +61,7 @@ final class FinScopeTestsUI: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        app.tabBars.buttons["Szukaj"].tap()
+        app.tabBars.buttons["Search"].tap()
 
         let searchField = app.searchFields["np. Apple, AAPL..."]
         XCTAssertTrue(searchField.exists)
@@ -79,7 +79,7 @@ final class FinScopeTestsUI: XCTestCase {
         let closeButton = app.buttons["Close"]
         if closeButton.waitForExistence(timeout: 2) {
             closeButton.tap()
-            XCTAssertTrue(app/*@START_MENU_TOKEN@*/.staticTexts["Szukaj"]/*[[".navigationBars",".staticTexts",".staticTexts[\"Szukaj\"]"],[[[-1,2],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.exists)
+            XCTAssertTrue(app.staticTexts["Search"].exists)
         }
     }
 
@@ -88,7 +88,6 @@ final class FinScopeTestsUI: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // Próba wejścia w szczegóły pierwszej dostępnej akcji
         let firstCell = app/*@START_MENU_TOKEN@*/.staticTexts["AA"]/*[[".buttons.staticTexts[\"AA\"]",".staticTexts[\"AA\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch
         firstCell.tap()
             
@@ -101,12 +100,10 @@ final class FinScopeTestsUI: XCTestCase {
         app.buttons["1M"].tap()
         app.buttons["3M"].tap()
         
-        // Sprawdź sekcje (Fundamentals, News, About)
         XCTAssertTrue(app.staticTexts["Fundamentals"].exists)
         XCTAssertTrue(app.staticTexts["News"].exists)
         XCTAssertTrue(app.staticTexts["About"].exists)
         
-        // Powrót
         app.navigationBars.buttons.element(boundBy: 0).tap()
         
     }

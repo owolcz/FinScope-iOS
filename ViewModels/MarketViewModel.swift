@@ -2,13 +2,13 @@ import Foundation
 import Combine
 
 enum AssetType: String, CaseIterable {
-    case stocks = "Akcje"
+    case stocks = "Stocks"
     case crypto = "Crypto"
     case forex  = "Forex"
 
     var symbols: [String] {
         switch self {
-        case .stocks: return ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "UBER", "WMT", "IBM"]
+        case .stocks: return ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "UBER", "WMT", "IBM", "ORCL"]
         case .crypto: return ["BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "DOGE-USD", "ADA-USD", "AVAX-USD"]
         case .forex:  return ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X", "USDCHF=X", "USDCAD=X", "NZDUSD=X"]
         }

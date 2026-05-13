@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import UIKit
 
 @MainActor
 class SearchViewModel: ObservableObject {
@@ -100,6 +101,11 @@ struct SearchView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                     }
+                    .background(
+                        VisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialDark))
+                            .opacity(0.3)
+                            .ignoresSafeArea()
+                    )
                 }
             }
             .navigationTitle("Szukaj")
@@ -172,4 +178,17 @@ struct SearchResultCard: View {
 
 #Preview {
     SearchView()
+}
+
+// MARK: - VisualEffectView
+struct VisualEffectView: UIViewRepresentable {
+    var effect: UIVisualEffect?
+    
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        UIVisualEffectView(effect: effect)
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+        uiView.effect = effect
+    }
 }
