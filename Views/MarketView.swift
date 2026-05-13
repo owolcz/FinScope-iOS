@@ -65,6 +65,8 @@ struct MarketView: View {
                                                 viewModel.toggleFavorite(for: quote.symbol)
                                             }
                                         )
+                                        .accessibilityIdentifier("QuoteCard")
+
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -110,6 +112,7 @@ struct QuoteRowCard: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white)
                 .lineLimit(1)
+                .accessibilityIdentifier("symbolText")
 
             Spacer()
 
@@ -138,9 +141,14 @@ struct QuoteRowCard: View {
                         .foregroundColor(isFavorite ? Color.fsAccent : Color.fsSecondary.opacity(0.5))
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("favouriteButton")
+                .accessibilityLabel(isFavorite ? "Ulubione" : "Dodaj do ulubionych")
+
             }
         }
+        .accessibilityElement(children: .contain)
         .padding(14)
+
         .background(Color.fsSurface)
         .cornerRadius(14)
         .overlay(
