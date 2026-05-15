@@ -87,7 +87,7 @@ final class FinScopeTestsUI: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let firstCell = app.buttons.matching(identifier: "QuoteCard").firstMatch
+        let firstCell = app.buttons.staticTexts["AA"].firstMatch
         XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
         firstCell.tap()
             
@@ -105,5 +105,47 @@ final class FinScopeTestsUI: XCTestCase {
         XCTAssertTrue(app.staticTexts["About"].exists)
         
         app.navigationBars.buttons.element(boundBy: 0).tap()
+    }
+
+    @MainActor
+    func testCategoriesExpansionAndNavigation() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        app.tabBars.buttons["Categories"].tap()
+        
+        let techSection = app.buttons["Technology"]
+        XCTAssertTrue(techSection.waitForExistence(timeout: 5))
+        techSection.tap()
+        
+        let stockCard = app.buttons.staticTexts["AAPL"].firstMatch
+        XCTAssertTrue(stockCard.waitForExistence(timeout: 5), "Stock cards should appear after expanding section")
+        stockCard.tap()
+        
+        XCTAssertTrue(app.buttons["1W"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        techSection.tap()
+    }
+
+    @MainActor
+    func testSearchAndNavigateToDetails() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        app.tabBars.buttons["Search"].tap()
+        let searchField = app.searchFields["e.g. Apple, AAPL..."]
+        searchField.tap()
+        searchField.typeText("Apple")
+        app.keyboards.buttons["Search"].tap()
+        
+        let resultCell = app.buttons.staticTexts["AAPL"].firstMatch
+        XCTAssertTrue(resultCell.waitForExistence(timeout: 5), "Search result for AAPL should appear")
+        resultCell.tap()
+        
+        XCTAssertTrue(app.navigationBars["AAPL"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Fundamentals"].exists)
+        
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.navigationBars["Search"].exists)
     }
 }
