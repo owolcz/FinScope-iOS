@@ -1,5 +1,6 @@
 import SwiftUI
 
+// Main dashboard showing real-time prices for Stocks, Crypto, and Forex
 struct MarketView: View {
     @StateObject private var viewModel = MarketViewModel()
 
@@ -9,6 +10,7 @@ struct MarketView: View {
                 Color.fsBackground.ignoresSafeArea()
 
                 if viewModel.isLoading {
+                    // Loading state
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(Color.fsAccent)
@@ -18,6 +20,7 @@ struct MarketView: View {
                     }
 
                 } else if let error = viewModel.errorMessage {
+                    // Error state with retry button
                     VStack(spacing: 20) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 44))
@@ -39,6 +42,7 @@ struct MarketView: View {
 
                 } else {
                     VStack(spacing: 0) {
+                        // Segmented control to switch between asset categories
                         Picker("", selection: $viewModel.assetType) {
                             ForEach(AssetType.allCases, id: \.self) {
                                 Text($0.rawValue).tag($0)
@@ -87,6 +91,7 @@ struct MarketView: View {
     }
 }
 
+// Reusable component to display a single asset's summary
 struct QuoteRowCard: View {
     let quote: StockQuote
     let assetType: AssetType
@@ -155,6 +160,7 @@ struct QuoteRowCard: View {
     }
 }
 
+// Formats prices according to asset type (e.g., 4 decimals for Forex)
 private func marketFormattedPrice(_ price: Double, type: AssetType) -> String {
     switch type {
     case .stocks, .crypto:

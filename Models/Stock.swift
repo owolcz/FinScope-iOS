@@ -1,5 +1,6 @@
 import Foundation
 
+// Represents a real-time stock price and its daily change
 struct StockQuote: Codable, Identifiable, Hashable {
     let id: UUID = UUID()
     let symbol: String
@@ -18,6 +19,7 @@ struct StockQuote: Codable, Identifiable, Hashable {
         case lastUpdated   = "last_updated"
     }
 
+    // Computed property to convert percentage string to Double
     var changePercentValue: Double {
         let cleaned = changePercent
             .replacingOccurrences(of: "%", with: "")
@@ -26,6 +28,7 @@ struct StockQuote: Codable, Identifiable, Hashable {
     }
 }
 
+// Model for search results returned by the API
 struct SearchResult: Codable, Identifiable {
     let symbol: String
     let name: String?
@@ -47,6 +50,7 @@ struct SearchResponse: Codable {
     let results: [SearchResult]
 }
 
+// News article model for stock-related news
 struct NewsArticle: Codable, Identifiable {
     let headline: String?
     let summary: String?
@@ -57,6 +61,7 @@ struct NewsArticle: Codable, Identifiable {
 
     var id: Int { datetime ?? Int.random(in: 0...Int.max) }
 
+    // Formats the Unix timestamp into a readable date string
     var publishedDate: String? {
         guard let ts = datetime else { return nil }
         let date = Date(timeIntervalSince1970: TimeInterval(ts))
@@ -72,11 +77,13 @@ struct NewsResponse: Codable {
     let news: [NewsArticle]
 }
 
+// Defines supported asset classes and their characteristics
 enum AssetType: String, CaseIterable {
     case stocks = "Stocks"
     case crypto = "Crypto"
     case forex  = "Forex"
 
+    // Default list of symbols for each category
     var symbols: [String] {
         switch self {
         case .stocks: return ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "UBER", "WMT", "IBM", "ORCL"]
@@ -87,6 +94,7 @@ enum AssetType: String, CaseIterable {
 
     var usesAssetEndpoint: Bool { self != .stocks }
 
+    // Formats symbols for display (e.g., BTC-USD -> BTC, EURUSD=X -> EUR/USD)
     func displayName(for symbol: String) -> String {
         switch self {
         case .stocks:

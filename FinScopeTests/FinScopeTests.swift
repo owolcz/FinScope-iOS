@@ -36,7 +36,7 @@ final class FinScopeTests: XCTestCase {
     
     func testNewsArticlePublishedDate() {
         // Test date formatting from Unix timestamp
-        // 1715589300 = May 13, 2024, 10:35 AM
+        // 1715589300 = May 13, 2024, 8:35 AM UTC
         let timestamp = 1715589300
         let article = NewsArticle(
             headline: "Test",
@@ -47,9 +47,13 @@ final class FinScopeTests: XCTestCase {
             datetime: timestamp
         )
         
-        let formattedDate = article.publishedDate
-        XCTAssertNotNil(formattedDate)
-        XCTAssertFalse(formattedDate?.isEmpty ?? true)
+        let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        let expected = f.string(from: date)
+        
+        XCTAssertEqual(article.publishedDate, expected)
         
         // Test nil case
         let nilArticle = NewsArticle(

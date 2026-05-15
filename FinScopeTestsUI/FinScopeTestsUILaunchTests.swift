@@ -19,6 +19,7 @@ final class FinScopeTestsUILaunchTests: XCTestCase {
 
     @MainActor
     func testLaunch() throws {
+        // Simple test to verify the app launches correctly and capture a screenshot of the initial state
         let app = XCUIApplication()
         app.launch()
 

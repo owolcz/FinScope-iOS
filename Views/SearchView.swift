@@ -2,6 +2,7 @@ import SwiftUI
 import Combine
 import UIKit
 
+// Manages search logic and debounced API requests
 @MainActor
 class SearchViewModel: ObservableObject {
     @Published var results: [SearchResult] = []
@@ -9,6 +10,7 @@ class SearchViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var assetType: AssetType = .stocks
 
+    // Filters search results based on the selected category
     var filteredResults: [SearchResult] {
         if results.isEmpty { return [] }
         let filtered = results.filter { result in
@@ -31,6 +33,7 @@ class SearchViewModel: ObservableObject {
         return filtered
     }
 
+    // Main search function, handles input validation and API calling
     func search(query: String) async {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmed.count >= 2 else {
@@ -54,6 +57,7 @@ class SearchViewModel: ObservableObject {
     }
 }
 
+// View for finding new assets via symbol or company name
 struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
     @State private var query = ""
@@ -199,6 +203,7 @@ struct SearchView: View {
         }
     }
 
+    // Fetches full quote details before navigating to the detail view
     private func loadAndNavigate(symbol: String) async {
         isLoadingQuote = true
         do {

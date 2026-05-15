@@ -15,6 +15,7 @@ final class FinScopeTestsUI: XCTestCase {
 
     @MainActor
     func testTabBarNavigation() throws {
+        // Verifies switching between all main application sections via the bottom Tab Bar
         let app = XCUIApplication()
         app.launch()
         
@@ -38,6 +39,7 @@ final class FinScopeTestsUI: XCTestCase {
     
     @MainActor
     func testMarketSegmentedControl() throws {
+        // Checks the category filter (Segmented Control) on the main Market screen
         let app = XCUIApplication()
         app.launch()
 
@@ -58,6 +60,7 @@ final class FinScopeTestsUI: XCTestCase {
 
     @MainActor
     func testSearchInteraction() throws {
+        // Tests the basic functionality of the search bar, including text input and clearing
         let app = XCUIApplication()
         app.launch()
 
@@ -84,6 +87,7 @@ final class FinScopeTestsUI: XCTestCase {
 
     @MainActor
     func testStockDetailsNavigationAndTabs() throws {
+        // Verifies navigating to a stock's detail view and interacting with chart range filters
         let app = XCUIApplication()
         app.launch()
 
@@ -109,6 +113,7 @@ final class FinScopeTestsUI: XCTestCase {
 
     @MainActor
     func testCategoriesExpansionAndNavigation() throws {
+        // Checks the hierarchical category browser and stock selection within categories
         let app = XCUIApplication()
         app.launch()
         
@@ -129,6 +134,7 @@ final class FinScopeTestsUI: XCTestCase {
 
     @MainActor
     func testSearchAndNavigateToDetails() throws {
+        // Verifies a complete user flow: searching for a symbol and opening its full details
         let app = XCUIApplication()
         app.launch()
         
