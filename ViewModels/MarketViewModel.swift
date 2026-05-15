@@ -1,35 +1,6 @@
 import Foundation
 import Combine
 
-enum AssetType: String, CaseIterable {
-    case stocks = "Stocks"
-    case crypto = "Crypto"
-    case forex  = "Forex"
-
-    var symbols: [String] {
-        switch self {
-        case .stocks: return ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "UBER", "WMT", "IBM", "ORCL"]
-        case .crypto: return ["BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD", "DOGE-USD", "ADA-USD", "AVAX-USD"]
-        case .forex:  return ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X", "USDCHF=X", "USDCAD=X", "NZDUSD=X"]
-        }
-    }
-
-    var usesAssetEndpoint: Bool { self != .stocks }
-
-    func displayName(for symbol: String) -> String {
-        switch self {
-        case .stocks:
-            return symbol
-        case .crypto:
-            return String(symbol.split(separator: "-").first ?? Substring(symbol))
-        case .forex:
-            let base = symbol.replacingOccurrences(of: "=X", with: "")
-            guard base.count >= 6 else { return base }
-            return String(base.prefix(3)) + "/" + String(base.suffix(3))
-        }
-    }
-}
-
 @MainActor
 class MarketViewModel: ObservableObject {
 
